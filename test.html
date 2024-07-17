@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+
+<script>
+    var formData = {
+        LOAI_TRA_CUU: "02",
+        GIA_TRI: '001223',
+        CaptchaTime: "CfDJ8D6iEx6NYfxNsjjMZmWN5jyOSpEzceWtNSI7hVZD1XYNppWmdHUq6gG329fT1bxShi_2WQUaxQQGboxp7pi4i-sL-hoeof_XhkV8xcK-VlFTZWF6e25lO_vhN8M63J_yIg",
+        CaptchaInput: "37FL",
+    }
+    fetch("https://tsdaucap.hanoi.gov.vn/tra-cuu-tuyen-sinh-10", {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'RequestVerificationToken': "CfDJ8D6iEx6NYfxNsjjMZmWN5jyZOQqriakPy9KMW0tK-F3-3kDQVjqTBV1VrGhJG8uHKOCU8Zdx1eC5bipcLmwoQC1c2CVucEj4yGxfVdocf8tB-FMdGxxPFrBVM0XbiRrcb3vP3g1RLCUKicCHlJN5gMQ" // Thay 'token' bằng giá trị thực tế
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Phản hồi từ server:', data);
+        console.log("OKE");
+      })
+      .catch(error => {
+        console.error('Lỗi khi gửi POST request:', error);
+      });
+</script>
+</html>
