@@ -16,14 +16,16 @@
 const Firestore = require('@google-cloud/firestore');
 
 const db = new Firestore({
-  projectId: 'alittledaisy',
-  keyFilename: './key.json',
+    projectId: 'alittledaisy',
+    keyFilename: './key.json',
 });
 
-const docRef = db.collection('users').doc('alovelace');
+async function writeData() {
+    const docRef = db.collection('users').doc('alovelace');
 
-await docRef.set({
-  first: 'Ada',
-  last: 'Lovelace',
-  born: 1815
-});
+    await docRef.set({
+        first: 'Ada',
+        last: 'Lovelace',
+        born: 1815
+    });
+}
