@@ -124,33 +124,49 @@ async function run(SBD) {
 
 async function main() {
     let i = 1101;
-    const batchSize = 10; // Số lượng yêu cầu gửi đồng thời
-    let queue = [];
-
-    while (i <= 1000000 | queue.length > 0) {
-        let promises = [];
-        let SBDs = [];
-
-        // Thêm các SBD vào batch
-        while (promises.length < batchSize && (i <= 1000000 || queue.length > 0)) {
-            let SBD = (queue.length > 0) ? queue.shift() : i.toString().padStart(6, '0');
-            promises.push(run(SBD));
-            SBDs.push(SBD);
+    let max = 0;
+    while (i <= 1000000) {
+        let SBD = i.toString().padStart(6, '0');
+        let res = await run(SBD);
+        if (res | max > 10) {
             i++;
+            max = 0;
         }
-
-        // Chờ cho tất cả các yêu cầu trong batch hoàn thành
-        let results = await Promise.all(promises);
-
-        results.forEach((res, index) => {
-            if (!res) {
-                // Nếu không nhận được kết quả, thêm SBD vào queue để thử lại
-                queue.push(SBDs[index]);
-                logMessage(`Thêm vào hàng đợi ${SBDs[index]}`);
-                console.log(`Thêm vào hàng đợi ${SBDs[index]}`);
-            }
-        });
+        else {
+            max++;
+        }
     }
 }
+
+// async function main() {
+//     let i = 1101;
+//     const batchSize = 10; // Số lượng yêu cầu gửi đồng thời
+//     let queue = [];
+
+//     while (i <= 1000000 | queue.length > 0) {
+//         let promises = [];
+//         let SBDs = [];
+
+//         // Thêm các SBD vào batch
+//         while (promises.length < batchSize && (i <= 1000000 || queue.length > 0)) {
+//             let SBD = (queue.length > 0) ? queue.shift() : i.toString().padStart(6, '0');
+//             promises.push(run(SBD));
+//             SBDs.push(SBD);
+//             i++;
+//         }
+
+//         // Chờ cho tất cả các yêu cầu trong batch hoàn thành
+//         let results = await Promise.all(promises);
+
+//         results.forEach((res, index) => {
+//             if (!res) {
+//                 // Nếu không nhận được kết quả, thêm SBD vào queue để thử lại
+//                 queue.push(SBDs[index]);
+//                 logMessage(`Thêm vào hàng đợi ${SBDs[index]}`);
+//                 console.log(`Thêm vào hàng đợi ${SBDs[index]}`);
+//             }
+//         });
+//     }
+// }
 
 main();
