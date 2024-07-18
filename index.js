@@ -13,32 +13,32 @@ const db = new Firestore({
     projectId: 'alittledaisy',
     keyFilename: './key.json',
     databaseId: 'alittledaisydatabase'
-  });
+});
 
 // Đường dẫn đến file log
 const logFilePath = path.join(__dirname, 'app.log');
 const lastestPath = path.join(__dirname, 'lastest.log');
 
 function logMessage(message) {
-  const logEntry = `${new Date().toISOString()} - ${message}\n`;
-  console.log(logEntry);
-  fs.appendFile(logFilePath, logEntry, (err) => {
-    if (err) throw err;
-  });
+    const logEntry = `${new Date().toISOString()} - ${message}\n`;
+    console.log(logEntry);
+    fs.appendFile(logFilePath, logEntry, (err) => {
+        if (err) throw err;
+    });
 }
 
 function logLastest(i) {
     const logEntry = Number(i);
     fs.appendFile(lastestPath, logEntry, (err) => {
-      if (err) throw err;
+        if (err) throw err;
     });
-  }
+}
 
-  async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
+async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
     // Tạo một document mới
     const docRef = db.collection('Student').doc(SBD);
 
-    try{
+    try {
         await docRef.set({
             SBD,
             ma_hoc_sinh,
@@ -50,7 +50,7 @@ function logLastest(i) {
         });
         logMessage(`Saved document with SBD: ${SBD}`);
     }
-    catch(error){
+    catch (error) {
         logLastest(SBD);
         logMessage(`Error saving document with SBD: ${SBD} - ${error.message}`);
     }
@@ -130,7 +130,8 @@ async function run(SBD) {
 
             addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(error => {
                 logLastest(SBD);
-                logMessage(error);});
+                logMessage(error);
+            });
         }
         return response.data.result | response.data.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.";
 
@@ -141,30 +142,38 @@ async function run(SBD) {
 }
 
 async function main() {
-    
+
     const latestFile = path.join(__dirname, 'latest.log');
     const defaultValue = 1101;
     let i;
     try {
-      if (fs.existsSync(latestFile)) {
-        const data = fs.readFileSync(latestFile, 'utf8').trim();
-        if (data) {
-          i = parseInt(data, 10);
-          if (isNaN(i)) {
-            console.warn(`Giá trị trong file không phải là số hợp lệ, sử dụng giá trị mặc định ${defaultValue}`);
-            i = defaultValue;
-          }
-        } else {
-          console.warn(`File rỗng, sử dụng giá trị mặc định ${defaultValue}`);
-          i = defaultValue;
+        if (fs.existsSync(latestFile)) {
+            const data = fs.readFileSync(latestFile, 'utf8').trim();
+            if (data) {
+                i = parseInt(data, 10);
+                if (isNaN(i)) {
+                    console.warn(`Giá trị trong file không phải là số hợp lệ, sử dụng giá trị mặc định ${defaultValue}`);
+                    i = defaultValue;
+                }
+            } else {
+                console.warn(`File rỗng, sử dụng giá trị mặc định ${defaultValue}`);
+                i = defaultValue;
+            }
         }
-      } else {
-        console.warn(`File không tồn tại, sử dụng giá trị mặc định ${defaultValue}`);
+        else {
+            console.warn(`File không tồn tại, sử dụng giá trị mặc định ${defaultValue}`);
+            i = defaultValue;
+            try {
+                fs.writeFileSync(latestFile, defaultValue.toString(), 'utf8');
+                console.log(`Đã khởi tạo file ${latestFile} với giá trị mặc định ${defaultValue}`);
+            } catch (err) {
+                console.error(`Lỗi khi khởi tạo file: ${err.message}`);
+            }
+        }
+    }
+    catch (err) {
+        console.error(`Lỗi khi đọc file: ${err.message}, sử dụng giá trị mặc định ${defaultValue}`);
         i = defaultValue;
-      }
-    } catch (err) {
-      console.error(`Lỗi khi đọc file: ${err.message}, sử dụng giá trị mặc định ${defaultValue}`);
-      i = defaultValue;
     }
 
     let max = 0;
