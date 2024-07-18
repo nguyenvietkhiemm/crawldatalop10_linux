@@ -28,10 +28,11 @@ function logMessage(message) {
 }
 
 function logLastest(i) {
-    const logEntry = i.toString();
-    fs.appendFile(latestFile, logEntry, (err) => {
-        if (err) throw err;
-    });
+    try {
+        fs.writeFileSync(latestFile, i.toString(), 'utf8');
+    } catch (err) {
+        console.error(`Lỗi khi ghi file: ${err.message}`);
+    }
 }
 
 async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
