@@ -74,8 +74,35 @@ async function run(SBD) {
             data: querystring.stringify(formData),
         };
         const response = await axios(config);
-        console.log(`Kết quả tra cứu SBD ${SBD}:`, response.data);
-        return response.data;
+        if (response.data.kq) {
+            const SBD = response.data.kq.soBaoDanh;
+            const ma_hoc_sinh = response.data.kq.maHocSinh;
+            const ho_ten = response.data.kq.hoTen;
+            let ngu_van = 0;
+            let ngoai_ngu = 0;
+            let toan = 0;
+            let tong_diem = 0;
+            var map = {
+                "Ngữ văn": 0,
+                "Ngoại ngữ": 0,
+                "Toán": 0,
+                "Tổng điểm XT": 0
+            }
+
+            for (let i of response.data.kq.diemThi.split(';')) {
+                let [mon_hoc, diem] = i.split(': ');
+                map[mon_hoc.trim()] = Number(diem);
+            }
+
+            ngu_van = map["Ngữ văn"];
+            ngoai_ngu = map["Ngoại ngữ"];
+            toan = map["Toán"];
+            tong_diem = map["Tổng điểm XT"]; // cho chắc thôi chứ xử lí thế này hơi cồng kềnh
+            console.log(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem);
+
+            await addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(console.error);
+        }
+        return response.data.result | response.data.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.";
 
     } catch (error) {
         console.error(`Lỗi trong quá trình tra cứu SBD ${SBD}:`, error);
