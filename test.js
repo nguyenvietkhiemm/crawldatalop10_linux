@@ -22,10 +22,14 @@ const db = new Firestore({
 
 async function writeData() {
     const docRef = db.collection('Student').doc('SBD');
-
-    await docRef.set({
-        first: 'Ada',
-        last: 'Lovelace',
-        born: 1815
-    });
+    try{
+        await docRef.set({
+            first: 'Ada',
+            last: 'Lovelace',
+            born: 1815
+        });
+    }
+    catch(error){
+        console.error('Error writing document: ', error);
+    }
 }
