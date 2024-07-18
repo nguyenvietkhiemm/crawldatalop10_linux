@@ -51,7 +51,6 @@ async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_
         logMessage(`Saved document with SBD: ${SBD}`);
     }
     catch (error) {
-        logLastest(SBD);
         logMessage(`Error saving document with SBD: ${SBD} - ${error.message}`);
     }
 }
@@ -129,14 +128,12 @@ async function run(SBD) {
             // logMessage(`${SBD} ${ma_hoc_sinh} ${ho_ten} ${ngu_van} ${ngoai_ngu} ${toan} ${tong_diem}`)
 
             addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(error => {
-                logLastest(SBD);
                 logMessage(error);
             });
         }
         return response.data.result | response.data.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.";
 
     } catch (error) {
-        logLastest(SBD);
         logMessage(`Lỗi trong quá trình tra cứu SBD ${SBD}: ${error}`);
     }
 }
@@ -178,6 +175,7 @@ async function main() {
 
     let max = 0;
     while (i <= 1000000) {
+        logLastest(i);
         let SBD = i.toString().padStart(6, '0');
         let res = await run(SBD);
         if (res | max > 10) {
