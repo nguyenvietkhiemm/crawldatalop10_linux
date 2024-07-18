@@ -2,32 +2,30 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const { exec } = require('child_process');
 const querystring = require('querystring');
-const { Datastore } = require('@google-cloud/datastore');
+const { Firestore } = require('@google-cloud/firestore');
 
 const url = 'https://tsdaucap.hanoi.gov.vn/tra-cuu-tuyen-sinh-10';
 const getcaptcha = 'https://tsdaucap.hanoi.gov.vn/getcaptcha';
-const datastore = new Datastore();
+const firestore = new Firestore({
+    projectId: 'alittledaisy',
+});
 
 async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
-    // Tạo một entity mới
-    const taskKey = datastore.key('Student');
-    const entity = {
-        key: taskKey,
-        data: {
-            SBD,
-            ma_hoc_sinh,
-            ho_ten,
-            ngu_van,
-            ngoai_ngu,
-            toan,
-            tong_diem,
-        }
-    };
+    // Tạo một document mới
+    const docRef = firestore.collection('Students').doc(SBD);
 
-    // Lưu entity vào Datastore
-    await datastore.save(entity);
+    // Lưu dữ liệu vào Firestore
+    await docRef.set({
+        SBD,
+        ma_hoc_sinh,
+        ho_ten,
+        ngu_van,
+        ngoai_ngu,
+        toan,
+        tong_diem,
+    });
 
-    console.log(`Saved ${entity.key.name}: ${entity.data.description}`);
+    console.log(`Saved document with SBD: ${SBD}`);
 }
 
 async function run(SBD) {
@@ -100,7 +98,7 @@ async function run(SBD) {
             tong_diem = map["Tổng điểm XT"]; // cho chắc thôi chứ xử lí thế này hơi cồng kềnh
             console.log(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem);
 
-            await addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(console.error);
+            addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(console.error);
         }
         return response.data.result | response.data.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.";
 
