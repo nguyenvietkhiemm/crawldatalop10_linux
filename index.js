@@ -3,6 +3,8 @@ const cheerio = require('cheerio');
 const { exec } = require('child_process');
 const querystring = require('querystring');
 const Firestore = require('@google-cloud/firestore');
+const fs = require('fs');
+const path = require('path');
 
 const url = 'https://tsdaucap.hanoi.gov.vn/tra-cuu-tuyen-sinh-10';
 const getcaptcha = 'https://tsdaucap.hanoi.gov.vn/getcaptcha';
@@ -12,6 +14,15 @@ const db = new Firestore({
     keyFilename: './key.json',
     databaseId: 'alittledaisydatabase'
   });
+
+// Đường dẫn đến file log
+const logFilePath = path.join(__dirname, 'app.log');
+function logMessage(message) {
+  const logEntry = `${new Date().toISOString()} - ${message}\n`;
+  fs.appendFile(logFilePath, logEntry, (err) => {
+    if (err) throw err;
+  });
+}
 
   async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
     // Tạo một document mới
@@ -28,6 +39,7 @@ const db = new Firestore({
         tong_diem,
     });
 
+    logMessage(`Saved document with SBD: ${SBD}`);
     console.log(`Saved document with SBD: ${SBD}`);
 }
 
@@ -99,14 +111,14 @@ async function run(SBD) {
             ngoai_ngu = map["Ngoại ngữ"];
             toan = map["Toán"];
             tong_diem = map["Tổng điểm XT"]; // cho chắc thôi chứ xử lí thế này hơi cồng kềnh
-            console.log(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem);
+            logMessage(`${SBD} ${ma_hoc_sinh} ${ho_ten} ${ngu_van} ${ngoai_ngu} ${toan} ${tong_diem}`)
 
-            addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(console.error);
+            addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(error => logMessage(error));
         }
         return response.data.result | response.data.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.";
 
     } catch (error) {
-        console.error(`Lỗi trong quá trình tra cứu SBD ${SBD}:`, error);
+        logMessage(`Lỗi trong quá trình tra cứu SBD ${SBD}: ` + error);
     }
 }
 
@@ -134,7 +146,8 @@ async function main() {
             if (!res) {
                 // Nếu không nhận được kết quả, thêm SBD vào queue để thử lại
                 queue.push(SBDs[index]);
-                console.log(SBDs[index]);
+                logMessage(`Thêm vào hàng đợi ${SBDs[index]}`);
+                console.log(`Thêm vào hàng đợi ${SBDs[index]}`);
             }
         });
     }
