@@ -21,7 +21,7 @@ async function run(SBD) {
         const image = resCaptcha.data.image;
 
         const decode = await new Promise((resolve, reject) => {
-            const activateVenvCommand = `. venv/bin/activate && python3 decode.py ${image}`;
+            const activateVenvCommand = `source venv/bin/activate && python3 decode.py ${image}`;
             exec(activateVenvCommand, (e, stdout, stderr) => {
                 if (e) {
                     return reject(`Lỗi: ${e.message}`);
