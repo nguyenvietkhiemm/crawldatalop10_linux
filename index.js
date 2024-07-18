@@ -2,11 +2,33 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const { exec } = require('child_process');
 const querystring = require('querystring');
-// const { Datastore } = require('@google-cloud/datastore');
+const { Datastore } = require('@google-cloud/datastore');
 
 const url = 'https://tsdaucap.hanoi.gov.vn/tra-cuu-tuyen-sinh-10';
 const getcaptcha = 'https://tsdaucap.hanoi.gov.vn/getcaptcha';
-// const datastore = new Datastore();
+const datastore = new Datastore();
+
+async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
+    // Tạo một entity mới
+    const taskKey = datastore.key('Student');
+    const entity = {
+        key: taskKey,
+        data: {
+            SBD,
+            ma_hoc_sinh,
+            ho_ten,
+            ngu_van,
+            ngoai_ngu,
+            toan,
+            tong_diem,
+        }
+    };
+
+    // Lưu entity vào Datastore
+    await datastore.save(entity);
+
+    console.log(`Saved ${entity.key.name}: ${entity.data.description}`);
+}
 
 async function run(SBD) {
     try {
@@ -66,7 +88,7 @@ async function main() {
     while (i <= 1000000) {
         let SBD = i.toString().padStart(6, '0');
         let res = await run(SBD);
-        if (res.result | max > 10 | res.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.") {
+        if (res | max > 10) {
             i++;
             max = 0;
         }
