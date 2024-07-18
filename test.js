@@ -21,7 +21,7 @@ const db = new Firestore({
 });
 
 async function writeData() {
-    const docRef = db.collection('users').doc('alovelace');
+    const docRef = db.collection('Student').doc('SBD');
 
     await docRef.set({
         first: 'Ada',
