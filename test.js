@@ -16,7 +16,6 @@ async function writeData() {
         console.log('Document successfully written!');
     } catch (error) {
         console.error('Error writing document: ', error);
-        writeData()
     }
 }
 

@@ -10,12 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@firebase/firestore": "^4.6.4",
     "@google-cloud/firestore": "^7.9.0",
     "axios": "^1.7.2",
     "cheerio": "^1.0.0-rc.12",
-    "firebase": "^10.12.3",
-    "firebase-admin": "^12.2.0",
     "form-data": "^4.0.0"
   }
 }

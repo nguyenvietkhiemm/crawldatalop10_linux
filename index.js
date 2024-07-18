@@ -2,17 +2,20 @@ const axios = require('axios');
 const cheerio = require('cheerio');
 const { exec } = require('child_process');
 const querystring = require('querystring');
-const { Firestore } = require('@google-cloud/firestore');
+const Firestore = require('@google-cloud/firestore');
 
 const url = 'https://tsdaucap.hanoi.gov.vn/tra-cuu-tuyen-sinh-10';
 const getcaptcha = 'https://tsdaucap.hanoi.gov.vn/getcaptcha';
-const firestore = new Firestore({
-    projectId: 'alittledaisy',
-});
 
-async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
+const db = new Firestore({
+    projectId: 'alittledaisy',
+    keyFilename: './key.json',
+    databaseId: 'alittledaisydatabase'
+  });
+
+  async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
     // Tạo một document mới
-    const docRef = firestore.collection('Students').doc(SBD);
+    const docRef = db.collection('Student').doc(SBD);
 
     // Lưu dữ liệu vào Firestore
     await docRef.set({
