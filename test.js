@@ -1,9 +1,11 @@
 const Firestore = require('@google-cloud/firestore');
 
-const db = new Firestore({
-    projectId: 'alittledaisy',
-    keyFilename: './key.json',
-});
+const db = new Firestore();
+
+
+// projectId: 'alittledaisy',
+// keyFilename: './key.json',
+// }
 
 async function writeData() {
     const docRef = db.collection('Student').doc('SBD');
