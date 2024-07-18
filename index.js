@@ -17,7 +17,7 @@ const db = new Firestore({
 
 // Đường dẫn đến file log
 const logFilePath = path.join(__dirname, 'app.log');
-const lastestPath = path.join(__dirname, 'lastest.log');
+const latestFile = path.join(__dirname, 'latest.log');
 
 function logMessage(message) {
     const logEntry = `${new Date().toISOString()} - ${message}\n`;
@@ -29,7 +29,7 @@ function logMessage(message) {
 
 function logLastest(i) {
     const logEntry = Number(i);
-    fs.appendFile(lastestPath, logEntry, (err) => {
+    fs.appendFile(latestFile, logEntry, (err) => {
         if (err) throw err;
     });
 }
@@ -140,7 +140,7 @@ async function run(SBD) {
 
 async function main() {
 
-    const latestFile = path.join(__dirname, 'latest.log');
+    
     const defaultValue = 1101;
     let i;
     try {
