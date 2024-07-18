@@ -22,7 +22,7 @@ async function run(SBD) {
 
         const decode = await new Promise((resolve, reject) => {
             const activateVenvCommand = `source venv/bin/activate && python3 decode.py ${image}`;
-            exec(activateVenvCommand, (e, stdout, stderr) => {
+            exec(`/bin/bash -c "${activateVenvCommand}"`, (e, stdout, stderr) => {
                 if (e) {
                     return reject(`Lỗi: ${e.message}`);
                 }
