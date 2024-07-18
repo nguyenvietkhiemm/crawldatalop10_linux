@@ -8,7 +8,7 @@ const url = 'https://tsdaucap.hanoi.gov.vn/tra-cuu-tuyen-sinh-10';
 const getcaptcha = 'https://tsdaucap.hanoi.gov.vn/getcaptcha';
 const firestore = new Firestore({
     projectId: 'alittledaisy',
-    keyFilename: './alittledaisy-f4399963a129.json'
+    // keyFilename: './alittledaisy-f4399963a129.json'
 });
 
 async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
