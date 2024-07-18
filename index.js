@@ -19,6 +19,7 @@ const db = new Firestore({
 const logFilePath = path.join(__dirname, 'app.log');
 function logMessage(message) {
   const logEntry = `${new Date().toISOString()} - ${message}\n`;
+  console.log(logEntry);
   fs.appendFile(logFilePath, logEntry, (err) => {
     if (err) throw err;
   });
@@ -118,7 +119,7 @@ async function run(SBD) {
         return response.data.result | response.data.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.";
 
     } catch (error) {
-        logMessage(`Lỗi trong quá trình tra cứu SBD ${SBD}: ` + error);
+        logMessage(`Lỗi trong quá trình tra cứu SBD ${SBD}: ${error}`);
     }
 }
 
