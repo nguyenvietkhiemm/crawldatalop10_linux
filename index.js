@@ -17,6 +17,8 @@ const db = new Firestore({
 
 // Đường dẫn đến file log
 const logFilePath = path.join(__dirname, 'app.log');
+const lastestPath = path.join(__dirname, 'lastest.log');
+
 function logMessage(message) {
   const logEntry = `${new Date().toISOString()} - ${message}\n`;
   console.log(logEntry);
@@ -25,23 +27,33 @@ function logMessage(message) {
   });
 }
 
+function logLastest(i) {
+    const logEntry = Number(i);
+    fs.appendFile(lastestPath, logEntry, (err) => {
+      if (err) throw err;
+    });
+  }
+
   async function addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem) {
     // Tạo một document mới
     const docRef = db.collection('Student').doc(SBD);
 
-    // Lưu dữ liệu vào Firestore
-    await docRef.set({
-        SBD,
-        ma_hoc_sinh,
-        ho_ten,
-        ngu_van,
-        ngoai_ngu,
-        toan,
-        tong_diem,
-    });
-
-    logMessage(`Saved document with SBD: ${SBD}`);
-    console.log(`Saved document with SBD: ${SBD}`);
+    try{
+        await docRef.set({
+            SBD,
+            ma_hoc_sinh,
+            ho_ten,
+            ngu_van,
+            ngoai_ngu,
+            toan,
+            tong_diem,
+        });
+        logMessage(`Saved document with SBD: ${SBD}`);
+    }
+    catch(error){
+        logLastest(SBD);
+        logMessage(`Error saving document with SBD: ${SBD} - ${error.message}`);
+    }
 }
 
 async function run(SBD) {
@@ -60,10 +72,12 @@ async function run(SBD) {
             const activateVenvCommand = `source venv/bin/activate && python3 decode.py ${image}`;
             exec(`/bin/bash -c "${activateVenvCommand}"`, (e, stdout, stderr) => {
                 if (e) {
+                    logLastest(SBD);
                     return reject(`Lỗi: ${e.message}`);
                 }
 
                 if (stderr) {
+                    logLastest(SBD);
                     return reject(`Lỗi: ${stderr}`);
                 }
 
@@ -112,19 +126,47 @@ async function run(SBD) {
             ngoai_ngu = map["Ngoại ngữ"];
             toan = map["Toán"];
             tong_diem = map["Tổng điểm XT"]; // cho chắc thôi chứ xử lí thế này hơi cồng kềnh
-            logMessage(`${SBD} ${ma_hoc_sinh} ${ho_ten} ${ngu_van} ${ngoai_ngu} ${toan} ${tong_diem}`)
+            // logMessage(`${SBD} ${ma_hoc_sinh} ${ho_ten} ${ngu_van} ${ngoai_ngu} ${toan} ${tong_diem}`)
 
-            addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(error => logMessage(error));
+            addData(SBD, ma_hoc_sinh, ho_ten, ngu_van, ngoai_ngu, toan, tong_diem).catch(error => {
+                logLastest(SBD);
+                logMessage(error);});
         }
         return response.data.result | response.data.message == "Không tìm thấy hồ sơ thí sinh, vui lòng kiểm tra lại.";
 
     } catch (error) {
+        logLastest(SBD);
         logMessage(`Lỗi trong quá trình tra cứu SBD ${SBD}: ${error}`);
     }
 }
 
 async function main() {
-    let i = 1101;
+    
+    const latestFile = path.join(__dirname, 'latest.log');
+    const defaultValue = 1101;
+    let i;
+    try {
+      if (fs.existsSync(latestFile)) {
+        const data = fs.readFileSync(latestFile, 'utf8').trim();
+        if (data) {
+          i = parseInt(data, 10);
+          if (isNaN(i)) {
+            console.warn(`Giá trị trong file không phải là số hợp lệ, sử dụng giá trị mặc định ${defaultValue}`);
+            i = defaultValue;
+          }
+        } else {
+          console.warn(`File rỗng, sử dụng giá trị mặc định ${defaultValue}`);
+          i = defaultValue;
+        }
+      } else {
+        console.warn(`File không tồn tại, sử dụng giá trị mặc định ${defaultValue}`);
+        i = defaultValue;
+      }
+    } catch (err) {
+      console.error(`Lỗi khi đọc file: ${err.message}, sử dụng giá trị mặc định ${defaultValue}`);
+      i = defaultValue;
+    }
+
     let max = 0;
     while (i <= 1000000) {
         let SBD = i.toString().padStart(6, '0');
