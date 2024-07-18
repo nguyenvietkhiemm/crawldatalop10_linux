@@ -28,7 +28,7 @@ function logMessage(message) {
 }
 
 function logLastest(i) {
-    const logEntry = Number(i);
+    const logEntry = i.toString();
     fs.appendFile(latestFile, logEntry, (err) => {
         if (err) throw err;
     });
@@ -140,7 +140,6 @@ async function run(SBD) {
 
 async function main() {
 
-    
     const defaultValue = 1101;
     let i;
     try {
