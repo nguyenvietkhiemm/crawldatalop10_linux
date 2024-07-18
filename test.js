@@ -1,21 +1,22 @@
-const Firestore = require('@google-cloud/firestore');
+const { initializeApp, applicationDefault, cert } = require('firebase-admin/app');
+const { getFirestore, Timestamp, FieldValue, Filter } = require('firebase-admin/firestore');
 
-const db = new Firestore({
-    projectId: 'alittledaisy',
-// keyFilename: './key.json',
-});
+initializeApp();
+
+const db = getFirestore();
 
 async function writeData() {
     const docRef = db.collection('Student').doc('SBD');
-    try{
+    try {
         await docRef.set({
             first: 'Ada',
             last: 'Lovelace',
             born: 1815
         });
-    }
-    catch(error){
+        console.log('Document successfully written!');
+    } catch (error) {
         console.error('Error writing document: ', error);
+        writeData()
     }
 }
 
