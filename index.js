@@ -112,17 +112,31 @@ async function run(SBD) {
 
 async function main() {
     let i = 1101;
-    let max = 0;
-    while (i <= 1000000) {
-        let SBD = i.toString().padStart(6, '0');
-        let res = await run(SBD);
-        if (res | max > 10) {
+    const batchSize = 10; // Số lượng yêu cầu gửi đồng thời
+    let queue = [];
+
+    while (i <= 1000000 | queue.length > 0) {
+        let promises = [];
+        let SBDs = [];
+
+        // Thêm các SBD vào batch
+        while (promises.length < batchSize && (i <= 1000000 || queue.length > 0)) {
+            let SBD = (queue.length > 0) ? queue.shift() : i.toString().padStart(6, '0');
+            promises.push(run(SBD));
+            SBDs.push(SBD);
             i++;
-            max = 0;
         }
-        else {
-            max++;
-        }
+
+        // Chờ cho tất cả các yêu cầu trong batch hoàn thành
+        let results = await Promise.all(promises);
+
+        results.forEach((res, index) => {
+            if (!res) {
+                // Nếu không nhận được kết quả, thêm SBD vào queue để thử lại
+                queue.push(SBDs[index]);
+                console.log(SBDs[index]);
+            }
+        });
     }
 }
 
