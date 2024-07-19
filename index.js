@@ -175,13 +175,13 @@ async function main() {
 
     let max = 0;
     while (i <= 1000000) {
-        logLastest(i);
         let SBD = i.toString().padStart(6, '0');
         console.log(`Đang crawl ${SBD}`);
         let res = await run(SBD);
         if (res | max > 10) {
             i++;
             max = 0;
+            logLastest(i);
         }
         else {
             max++;
