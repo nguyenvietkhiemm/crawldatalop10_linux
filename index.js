@@ -213,6 +213,7 @@ async function main() {
                 console.log(`Thêm vào hàng đợi ${SBDs[index]} vào ${queue}`);
             }
         });
+        logLastest(SBDs[0]);
     }
 }
 
