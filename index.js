@@ -203,7 +203,7 @@ async function main() {
 
         // Chờ cho tất cả các yêu cầu trong batch hoàn thành
         let results = await Promise.all(promises);
-        console.log(`Đang crawl ${promises.join('; ')}`);
+        console.log(`Đang crawl ${SBDs.join('; ')}`);
 
         results.forEach((res, index) => {
             if (!res) {
