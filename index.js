@@ -20,8 +20,8 @@ const logFilePath = path.join(__dirname, 'app.log');
 const latestFile = path.join(__dirname, 'latest.log');
 
 function logMessage(message) {
-    const logEntry = `${new Date().toISOString()} - ${message}\n`;
     console.log(logEntry);
+    const logEntry = `${new Date().toISOString()} - ${message}\n`;
     fs.appendFile(logFilePath, logEntry, (err) => {
         if (err) throw err;
     });
@@ -173,51 +173,76 @@ async function main() {
         i = defaultValue;
     }
 
-    let max = 0;
-    while (i <= 1000000) {
-        let SBD = i.toString().padStart(6, '0');
-        console.log(`Đang crawl ${SBD}`);
-        let res = await run(SBD);
-        if (res | max > 10) {
-            i++;
-            max = 0;
-            logLastest(i);
+    // let max = 0;
+    // while (i <= 1000000) {
+    //     let SBD = i.toString().padStart(6, '0');
+    //     console.log(`Đang crawl ${SBD}`);
+    //     let res = await run(SBD);
+    //     if (res | max > 10) {
+    //         i++;
+    //         max = 0;
+    //         logLastest(i);
+    //     }
+    //     else {
+    //         max++;
+    //     }
+    // }
+
+    const batchSize = 10; // Số lượng yêu cầu gửi đồng thời
+    let queue = [];
+    while (i <= 500000 | queue.length > 0) {
+        let promises = [];
+        let SBDs = [];
+
+        // Thêm các SBD vào batch
+        while (promises.length < batchSize) {
+            let SBD = (queue.length > 0) ? queue.shift() : (i++).toString().padStart(6, '0');
+            promises.push(run(SBD));
+            SBDs.push(SBD);
         }
-        else {
-            max++;
-        }
+
+        // Chờ cho tất cả các yêu cầu trong batch hoàn thành
+        let results = await Promise.all(promises);
+
+        results.forEach((res, index) => {
+            if (!res) {
+                // Nếu không nhận được kết quả, thêm SBD vào queue để thử lại
+                queue.push(SBDs[index]);
+                // logMessage(`Thêm vào hàng đợi ${SBDs[index]}`);
+                console.log(`Thêm vào hàng đợi ${SBDs[index]} vào ${queue}`);
+            }
+        });
     }
 }
 
-// async function main() {
-//     let i = 1101;
-//     const batchSize = 10; // Số lượng yêu cầu gửi đồng thời
-//     let queue = [];
+async function main() {
+    let i = 1101;
+    const batchSize = 10; // Số lượng yêu cầu gửi đồng thời
+    let queue = [];
 
-//     while (i <= 1000000 | queue.length > 0) {
-//         let promises = [];
-//         let SBDs = [];
+    while (i <= 500000 | queue.length > 0) {
+        let promises = [];
+        let SBDs = [];
 
-//         // Thêm các SBD vào batch
-//         while (promises.length < batchSize && (i <= 1000000 || queue.length > 0)) {
-//             let SBD = (queue.length > 0) ? queue.shift() : i.toString().padStart(6, '0');
-//             promises.push(run(SBD));
-//             SBDs.push(SBD);
-//             i++;
-//         }
+        // Thêm các SBD vào batch
+        while (promises.length < batchSize) {
+            let SBD = (queue.length > 0) ? queue.shift() : (i++).toString().padStart(6, '0');
+            promises.push(run(SBD));
+            SBDs.push(SBD);
+        }
 
-//         // Chờ cho tất cả các yêu cầu trong batch hoàn thành
-//         let results = await Promise.all(promises);
+        // Chờ cho tất cả các yêu cầu trong batch hoàn thành
+        let results = await Promise.all(promises);
 
-//         results.forEach((res, index) => {
-//             if (!res) {
-//                 // Nếu không nhận được kết quả, thêm SBD vào queue để thử lại
-//                 queue.push(SBDs[index]);
-//                 logMessage(`Thêm vào hàng đợi ${SBDs[index]}`);
-//                 console.log(`Thêm vào hàng đợi ${SBDs[index]}`);
-//             }
-//         });
-//     }
-// }
+        results.forEach((res, index) => {
+            if (!res) {
+                // Nếu không nhận được kết quả, thêm SBD vào queue để thử lại
+                queue.push(SBDs[index]);
+                // logMessage(`Thêm vào hàng đợi ${SBDs[index]}`);
+                console.log(`Thêm vào hàng đợi ${SBDs[index]}`);
+            }
+        });
+    }
+}
 
 main();
