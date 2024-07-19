@@ -15,7 +15,7 @@ image = Image.open(BytesIO(image_data))
 
 new_image = Image.new('RGB', image.size, (255, 255, 255))
 new_image.paste(image, (0, 0), image)
-new_image = new_image.resize((int(image.size[0] / 2), image.size[1]))
+new_image = new_image.resize((int(image.size[0] / 2) * 3, image.size[1] * 3))
 
 
 gray_image = ImageOps.grayscale(new_image)
