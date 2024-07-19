@@ -20,7 +20,7 @@ const logFilePath = path.join(__dirname, 'app.log');
 const latestFile = path.join(__dirname, 'latest.log');
 
 function logMessage(message) {
-    console.log(logEntry);
+    console.log(message);
     const logEntry = `${new Date().toISOString()} - ${message}\n`;
     fs.appendFile(logFilePath, logEntry, (err) => {
         if (err) throw err;
@@ -203,6 +203,7 @@ async function main() {
 
         // Chờ cho tất cả các yêu cầu trong batch hoàn thành
         let results = await Promise.all(promises);
+        console.log(`Đang crawl ${promises}`);
 
         results.forEach((res, index) => {
             if (!res) {
