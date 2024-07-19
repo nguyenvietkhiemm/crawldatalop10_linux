@@ -188,7 +188,7 @@ async function main() {
     //     }
     // }
 
-    const batchSize = 25; // Số lượng yêu cầu gửi đồng thời
+    const batchSize = 20; // Số lượng yêu cầu gửi đồng thời
     let queue = [];
     while (i <= 500000 | queue.length > 0) {
         let promises = [];
