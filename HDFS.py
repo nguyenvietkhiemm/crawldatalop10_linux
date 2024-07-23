@@ -25,8 +25,8 @@ data = fetch_data_from_firestore(collection_name)
 df_spark = spark.read.json(spark.sparkContext.parallelize([json.dumps(doc) for doc in data]))
 
 # Lưu DataFrame vào HDFS
-# hdfs_path = "hdfs:///user/your-username/firestore-data"
-# df.write.parquet(hdfs_path, mode="overwrite")
+hdfs_path = "hdfs://10.140.0.2:9000/usr/nguyenvietkhiemm"
+df_spark.write.parquet(hdfs_path, mode="overwrite")
 df_spark.show()
 
 print("Data written to HDFS successfully")
